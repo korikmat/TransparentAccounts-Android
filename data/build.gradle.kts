@@ -1,23 +1,18 @@
 plugins {
-    alias(libs.plugins.android.application)
+    alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
 }
 
 android {
-    namespace = "com.korikmat.transparentaccounts"
+    namespace = "com.korikmat.data"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.korikmat.transparentaccounts"
         minSdk = 29
-        targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles("consumer-rules.pro")
     }
 
     buildTypes {
@@ -36,37 +31,19 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
-    buildFeatures {
-        compose = true
-    }
 }
 
 dependencies {
+    // Modules
     implementation(project(":domain"))
-    implementation(project(":data"))
-
-    // Navigation Compose
-    implementation(libs.androidx.navigation.compose)
 
     // Retrofit
     implementation(libs.retrofit)
-    // OkHttp
-    implementation(libs.okhttp)
-    implementation(libs.logging.interceptor)
-    implementation(libs.converter.gson)
-
-    // Hilt
-    implementation (libs.hilt.android)
-    annotationProcessor (libs.hilt.compiler)
-    // For instrumentation tests
-    androidTestImplementation  (libs.hilt.android.testing)
-    androidTestAnnotationProcessor (libs.hilt.compiler)
-    // For local unit tests
-    testImplementation (libs.hilt.android.testing)
-    testAnnotationProcessor (libs.hilt.compiler)
 
     // Room
     implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.core)
+    implementation(libs.androidx.work.runtime.ktx)
     // If this project uses any Kotlin source, use Kotlin Symbol Processing (KSP)
     // See Add the KSP plugin to your project
     ksp(libs.androidx.room.compiler)
@@ -92,18 +69,9 @@ dependencies {
     implementation(libs.datastore.preferences.rxjava3)
 
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.ui)
-    implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.material)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
 }

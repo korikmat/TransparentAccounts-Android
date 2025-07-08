@@ -21,3 +21,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "Transparent Accounts"
 include(":app")
+include(":data")
+include(":domain")
