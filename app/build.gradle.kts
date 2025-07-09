@@ -1,14 +1,42 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
+}
+
+fun Project.resolveApiKey(keyName: String): String {
+    findProperty(keyName)
+        ?.toString()
+        ?.takeIf { it.isNotBlank() }
+        ?.let { return it }
+
+    val localFile = rootProject.file("local.properties")
+    if (localFile.exists()) {
+        val props = Properties().apply {
+            localFile.inputStream().use { load(it) }
+        }
+        props.getProperty(keyName)
+            ?.takeIf { it.isNotBlank() }
+            ?.let { return it }
+    }
+
+    System.getenv(keyName)
+        ?.takeIf { it.isNotBlank() }
+        ?.let { return it }
+
+    return ""
 }
 
 android {
     namespace = "com.korikmat.transparentaccounts"
     compileSdk = 35
+
+    buildFeatures {
+        buildConfig = true
+    }
 
     defaultConfig {
         applicationId = "com.korikmat.transparentaccounts"
@@ -18,6 +46,20 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        val apiKey = resolveApiKey("EDP_API_KEY")
+
+        if (apiKey.isBlank()) {
+            throw GradleException(
+                """
+                API key not found!
+                Please add EDP_API_KEY to your local.properties file 
+                or set it as an environment variable before building.
+                """.trimIndent()
+            )
+        }
+
+        buildConfigField("String", "API_KEY", "\"$apiKey\"")
     }
 
     buildTypes {
@@ -55,15 +97,9 @@ dependencies {
     implementation(libs.logging.interceptor)
     implementation(libs.converter.gson)
 
-    // Hilt
-    implementation (libs.hilt.android)
-    annotationProcessor (libs.hilt.compiler)
-    // For instrumentation tests
-    androidTestImplementation  (libs.hilt.android.testing)
-    androidTestAnnotationProcessor (libs.hilt.compiler)
-    // For local unit tests
-    testImplementation (libs.hilt.android.testing)
-    testAnnotationProcessor (libs.hilt.compiler)
+    // Koin
+    implementation(libs.koin.androidx.compose)
+    implementation(libs.koin.androidx.compose.navigation)
 
     // Room
     implementation(libs.androidx.room.runtime)

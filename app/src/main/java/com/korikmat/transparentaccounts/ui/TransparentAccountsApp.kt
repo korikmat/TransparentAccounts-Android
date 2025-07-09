@@ -2,11 +2,7 @@ package com.korikmat.transparentaccounts.ui
 
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -27,28 +23,24 @@ fun TransparentAccountsApp() {
             nav,
             startDestination = NavigationScreens.Accounts.screenRoute,
         ) {
-            composable(NavigationScreens.Accounts.screenRoute) { backStackEntry ->
+            composable(NavigationScreens.Accounts.screenRoute) {
                 AccountsScreen(
                     shared = this@SharedTransitionLayout,
                     visibility = this@composable
                 ) { id ->
-
-                    nav.navigate(NavigationScreens.SelectedAccount.screenRoute + "/$id") {
+                    nav.navigate(NavigationScreens.SelectedAccount.screenRoute + "/" + id) {
                         launchSingleTop = true
-                        restoreState = true
                     }
                 }
-
             }
 
             composable(
-
                 NavigationScreens.SelectedAccount.screenRoute + "/{id}",
-                arguments = listOf(navArgument("id") { type = NavType.IntType })
+                arguments = listOf(navArgument("id") { type = NavType.StringType })
             )
             { backStackEntry ->
                 AccountDetailsScreen(
-                    id = backStackEntry.arguments!!.getInt("id"),
+                    id = backStackEntry.arguments!!.getString("id", ""),
                     onBackClick = { nav.navigateUp() },
                     shared = this@SharedTransitionLayout,
                     visibility = this@composable
